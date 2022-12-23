@@ -1,4 +1,6 @@
+/* eslint-disable class-methods-use-this */
 const PasswordHash = require('../../Applications/security/PasswordHash');
+const AuthenticationError = require('../../Commons/exceptions/AuthenticationError');
 
 class BcryptPasswordHash extends PasswordHash {
   constructor(bcrypt, saltRound = 10) {
@@ -9,6 +11,14 @@ class BcryptPasswordHash extends PasswordHash {
 
   async hash(password) {
     return this._bcrypt.hash(password, this._saltRound);
+  }
+
+  async comparePassword(plainPassword, encrypetedPassword) {
+    const result = await this._bcrypt.compare(plainPassword, encrypetedPassword);
+
+    if (!result) {
+      throw new AuthenticationError('kredensial yang Anda masukkan salah');
+    }
   }
 }
 
