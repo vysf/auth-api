@@ -1,4 +1,5 @@
 const LoginUserUseCase = require('../../../../Applications/use_case/LoginUserUseCase');
+const LogoutUseCase = require('../../../../Applications/use_case/LogoutUseCase');
 const RefreshAuthenticationUseCase = require('../../../../Applications/use_case/RefreshAuthenticationUseCase');
 
 class AuthenticationHandler {
@@ -7,6 +8,7 @@ class AuthenticationHandler {
 
     this.postAuthtenticationHandler = this.postAuthtenticationHandler.bind(this);
     this.putAuthtenticationHandler = this.putAuthtenticationHandler.bind(this);
+    this.deleteAuthtenticationHandler = this.deleteAuthtenticationHandler.bind(this);
   }
 
   async postAuthtenticationHandler(request, h) {
@@ -28,13 +30,22 @@ class AuthenticationHandler {
   async putAuthtenticationHandler(request) {
     const refreshAuthenticationUseCase = this._constainer
       .getInstance(RefreshAuthenticationUseCase.name);
-    const accessToken = refreshAuthenticationUseCase.execute(request.payload);
+    const accessToken = await refreshAuthenticationUseCase.execute(request.payload);
 
     return {
       status: 'success',
       data: {
         accessToken,
       },
+    };
+  }
+
+  async deleteAuthtenticationHandler(request) {
+    const logoutUserCase = this._constainer.getInstance(LogoutUseCase.name);
+    await logoutUserCase.execute(request.payload);
+
+    return {
+      status: 'success',
     };
   }
 }
